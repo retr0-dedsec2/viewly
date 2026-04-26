@@ -1,0 +1,45 @@
+.page { padding: 30px 28px 24px; display: flex; flex-direction: column; gap: 24px; }
+.heading { font-size: 26px; font-weight: 600; letter-spacing: -0.5px; margin-bottom: 2px; }
+.sub { font-size: 13.5px; color: var(--text3); margin-top: -16px; }
+.heroGrid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 14px; }
+.grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+.gemCard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-sm); }
+.featured { background: linear-gradient(135deg, rgba(11,122,92,.14), rgba(16,32,60,.22)), var(--surface); }
+.gemTop, .sectionHead { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.gemIcon, .comingIcon { font-size: 24px; }
+.badge { font-size: 9.5px; font-weight: 700; padding: 3px 8px; border-radius: 20px; text-transform: uppercase; letter-spacing: .4px; }
+.ai { background: rgba(70, 119, 255, .12); color: #6c8dff; }
+.new { background: rgba(16,163,127,.14); color: var(--accent); }
+.live { background: rgba(255,82,82,.12); color: #ff6666; }
+.beta { background: rgba(255,159,10,.14); color: #ffb347; }
+.gemTitle { font-size: 15px; font-weight: 700; }
+.gemDesc, .comingDesc { font-size: 12.8px; color: var(--text2); line-height: 1.55; }
+.metricGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.metric { padding: 12px; border-radius: 14px; background: var(--surface2); display: flex; flex-direction: column; gap: 4px; }
+.metric span { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; }
+.metric strong { font-size: 18px; }
+.tags, .inlineList, .promptList { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag, .inlineChip, .promptChip { border-radius: 999px; background: var(--surface2); border: 1px solid var(--border); color: var(--text2); padding: 8px 12px; font-size: 12px; }
+.promptChip { text-align: left; }
+.actionRow { display: flex; gap: 10px; flex-wrap: wrap; }
+.primaryBtn, .secondaryBtn, .notifyBtn { border-radius: 12px; padding: 10px 14px; font-weight: 600; }
+.primaryBtn { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: white; }
+.secondaryBtn, .notifyBtn { background: var(--surface2); color: var(--text1); border: 1px solid var(--border); }
+.input, .textarea { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: var(--surface2); color: var(--text1); }
+.coverPreview { min-height: 120px; border-radius: 18px; padding: 18px; display: flex; flex-direction: column; justify-content: flex-end; color: white; gap: 6px; }
+.coverPreview strong { font-size: 22px; }
+.roomCode { font-size: 24px; letter-spacing: .14em; font-weight: 700; padding: 12px 14px; border-radius: 14px; background: var(--surface2); }
+.comingSoon { display: flex; flex-direction: column; gap: 12px; }
+.comingTitle { font-size: 17px; font-weight: 600; }
+.comingList { display: flex; flex-direction: column; gap: 10px; }
+.comingItem { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.comingInfo { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.comingName { font-size: 13.5px; font-weight: 600; }
+.recoGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.recoCard { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 10px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.recoCard img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; }
+.recoCard strong { font-size: 13px; }
+.recoCard span { font-size: 12px; color: var(--text3); }
+.notice { padding: 14px 16px; border-radius: 14px; background: var(--surface2); color: var(--text2); }
+@media (max-width: 980px) { .heroGrid, .grid, .recoGrid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 720px) { .page { padding: 20px 14px 18px; } .heroGrid, .grid, .recoGrid, .metricGrid { grid-template-columns: 1fr; } .roomCode { font-size: 18px; } }

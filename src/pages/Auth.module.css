@@ -1,0 +1,85 @@
+.wrap {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 36px 20px;
+}
+
+.card {
+  width: min(100%, 980px);
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  padding: 26px;
+  box-shadow: var(--shadow-lg);
+}
+
+.hero {
+  padding: 26px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at top left, rgba(20,163,127,0.18), transparent 32%),
+    linear-gradient(180deg, rgba(16,32,60,0.95), rgba(10,16,26,0.95));
+  color: white;
+}
+
+.eyebrow { display: inline-block; margin-bottom: 12px; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.7); }
+.hero h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.02; margin-bottom: 12px; }
+.hero p { color: rgba(255,255,255,0.8); max-width: 46ch; line-height: 1.6; }
+
+.panelCol { display: flex; flex-direction: column; gap: 16px; }
+.demoBox, .form, .switcher {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  padding: 18px;
+}
+
+.demoBox { display: flex; flex-direction: column; gap: 8px; color: var(--text2); }
+.switcher { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.switchBtn {
+  height: 46px;
+  border-radius: 14px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  font-weight: 700;
+}
+.switchBtnActive {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  border-color: transparent;
+}
+.form { display: flex; flex-direction: column; gap: 14px; }
+.form label { display: flex; flex-direction: column; gap: 8px; }
+.form span { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text3); }
+.form input {
+  height: 48px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text1);
+  padding: 0 14px;
+}
+.error, .message {
+  border-radius: 14px;
+  padding: 12px 14px;
+  color: var(--text1);
+}
+.error { background: rgba(255,99,132,0.12); }
+.message { background: rgba(20,163,127,0.14); }
+.submit {
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  font-weight: 700;
+}
+
+@media (max-width: 860px) {
+  .card { grid-template-columns: 1fr; padding: 16px; }
+  .hero { padding: 20px; }
+}
