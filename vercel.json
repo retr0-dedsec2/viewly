@@ -1,4 +1,12 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist"
+  "experimentalServices": {
+    "frontend": {
+      "routePrefix": "/",
+      "framework": "vite"
+    },
+    "backend": {
+      "entrypoint": "backend/server.js",
+      "routePrefix": "/api"
+    }
+  }
 }
