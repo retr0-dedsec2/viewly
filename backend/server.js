@@ -3,8 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import Datastore from 'nedb-promises';
-import { createClient } from '@supabase/supabase-js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
@@ -20,6 +18,7 @@ import {
 } from './prismaAdapter.js';
 
 const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const isProduction = process.env.NODE_ENV === 'production';
 const isVercel = process.env.VERCEL === '1';
 function vercelDeploymentOrigin() {
@@ -2747,12 +2746,14 @@ app.use((err, req, res, _next) => {
 
 ensureIndexes()
   .then(ensureSeed)
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Viewly backend running on http://localhost:${PORT}`);
-    });
-  })
   .catch((error) => {
-    console.error('Failed to start backend:', error);
-    process.exit(1);
+    console.error('Failed to initialize backend:', error);
   });
+
+export default app;
+
+if (!isVercel) {
+  app.listen(PORT, () => {
+    console.log(`Viewly backend running on http://localhost:${PORT}`);
+  });
+}
