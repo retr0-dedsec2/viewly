@@ -1484,154 +1484,271 @@ function addWeighted(map, rawName, weight = 1) {
   map.set(name, (map.get(name) || 0) + weight);
 }
 
-function rankMap(map, limit = 5) {
+function rankMap(map, limit = 8) {
   return [...map.entries()]
     .sort((a, b) => b[1] - a[1])
     .slice(0, limit)
-    .map(([name, count]) => ({ name, count: Math.round(count * 10) / 10 }));
+    .map(([name, score]) => ({
+      name,
+      score: Math.round(score * 10) / 10,
+    }));
 }
 
 function inferTrackStyles(track) {
   const blob =
-    `${track?.title || ''} ${track?.artist || ''} ${track?.tag || ''}`.toLowerCase();
+    `${track?.title || ''} ${track?.artist || ''} ${track?.tag || ''} ${track?.description || ''}`.toLowerCase();
   const styles = [];
-  if (/(rap|hip.?hop|trap|drill)/i.test(blob)) styles.push('hip-hop');
-  if (/(electro|edm|dance|club|house|techno|funk|disco)/i.test(blob))
+
+  if (/house|dance|edm|club|disco|funk|electro|techno|groove|dj/i.test(blob))
     styles.push('dance');
-  if (/(pop|hit|radio)/i.test(blob)) styles.push('pop');
-  if (/(jazz|soul|r&b|rnb|blues)/i.test(blob)) styles.push('soul');
-  if (/(ambient|lo.?fi|chill|acoustic|calm|piano)/i.test(blob))
+  if (/remix|edit|bootleg|mashup|slowed|sped up/i.test(blob))
+    styles.push('remix');
+  if (
+    /french|france|français|francais|variete|variété|indila|stromae|aznavour/i.test(
+      blob,
+    )
+  )
+    styles.push('francophone');
+  if (/yann|muller|sunset|summer|tropical|french touch|nu disco/i.test(blob))
+    styles.push('french remix');
+  if (/80s|90s|2000|nostalg|classic|old school/i.test(blob))
+    styles.push('nostalgique');
+  if (/rap|hip.?hop|trap|drill/i.test(blob)) styles.push('hip-hop');
+  if (/pop|hit|radio|charts/i.test(blob)) styles.push('pop');
+  if (/chill|lo.?fi|ambient|calm|soft|piano|acoustic/i.test(blob))
     styles.push('chill');
-  if (/(rock|metal|punk|guitar)/i.test(blob)) styles.push('rock');
-  if (/(fr|french|france|variete)/i.test(blob)) styles.push('francophone');
+  if (/rock|metal|punk|guitar/i.test(blob)) styles.push('rock');
+
   return styles.length ? styles : ['eclectique'];
 }
 
-function scoreEnergy(blob) {
-  let score = 0;
-  if (
-    /(party|dance|club|energy|funk|hit|max|edm|techno|drill|trap)/i.test(blob)
-  )
-    score += 4;
-  if (/(ambient|soul|acoustic|calm|sleep|lo.?fi|piano|mood)/i.test(blob))
-    score -= 3;
-  return score;
+function getTrackEnergy(track) {
+  const blob =
+    `${track?.title || ''} ${track?.artist || ''} ${track?.tag || ''}`.toLowerCase();
+  let score = 50;
+
+  if (/party|dance|club|edm|house|techno|funk|disco|remix|bootleg/i.test(blob))
+    score += 28;
+  if (/hit|summer|groove|rap|trap|drill|rock/i.test(blob)) score += 10;
+  if (/chill|lo.?fi|ambient|calm|sleep|piano|acoustic|soft/i.test(blob))
+    score -= 26;
+
+  return Math.max(0, Math.min(100, score));
 }
 
-function scoreTrackMood(blob, mood) {
-  const energetic =
-    /(party|dance|club|energy|funk|hit|max|edm|techno|drill|trap)/i.test(blob);
-  const chill = /(ambient|soul|acoustic|calm|sleep|lo.?fi|piano|mood)/i.test(
-    blob,
+async function getTasteProfile(userId) {
+  const [history, favorites, playlists] = await Promise.all([
+    historyDb.find({ userId }).sort({ lastPlayedAt: -1 }).limit(100),
+    favoritesDb.find({ userId }).sort({ createdAt: -1 }).limit(100),
+    playlistsDb.find({ userId }).sort({ updatedAt: -1 }).limit(50),
+  ]);
+
+  const artistCount = new Map();
+  const tagCount = new Map();
+  const styleCount = new Map();
+  const sampledIds = new Set();
+
+  let weightedEnergy = 0;
+  let totalWeight = 0;
+
+  function addTrack(track, weight = 1) {
+    const normalized = normalizeTrack(track);
+    if (!normalized) return;
+
+    const key = normalized.youtubeId || normalized.id;
+    if (key) sampledIds.add(key);
+
+    addWeighted(artistCount, normalized.artist, weight);
+    addWeighted(tagCount, normalized.tag, weight);
+
+    for (const style of inferTrackStyles(normalized)) {
+      addWeighted(styleCount, style, weight);
+    }
+
+    weightedEnergy += getTrackEnergy(normalized) * weight;
+    totalWeight += weight;
+  }
+
+  history.forEach((entry, index) => {
+    const recency = Math.max(0.35, 1 - index / 100);
+    const plays = Math.min(10, Number(entry.playCount || 1));
+    addTrack(entry.track, recency * (1 + plays * 0.45));
+  });
+
+  favorites.forEach((item) => addTrack(item.track, 5));
+
+  playlists.forEach((playlist, index) => {
+    const weight = Math.max(0.5, 3 - index * 0.05);
+    (playlist.tracks || [])
+      .slice(0, 40)
+      .forEach((track) => addTrack(track, weight));
+  });
+
+  const topArtists = rankMap(artistCount, 8);
+  const topTags = rankMap(tagCount, 8);
+  const topStyles = rankMap(styleCount, 8);
+  const sampleSize = sampledIds.size;
+
+  const energyScore = totalWeight
+    ? Math.round(weightedEnergy / totalWeight)
+    : 50;
+
+  const diversityScore = Math.max(
+    20,
+    Math.min(
+      100,
+      Math.round(
+        artistCount.size * 9 + styleCount.size * 12 + tagCount.size * 5,
+      ),
+    ),
   );
-  if (mood === 'energique') return energetic ? 3 : chill ? -1 : 0;
-  if (mood === 'chill') return chill ? 3 : energetic ? -1 : 0;
-  return energetic || chill ? 1 : 0.5;
+
+  const discoveryScore = Math.max(
+    10,
+    Math.min(
+      100,
+      Math.round(
+        history.length * 1.5 + favorites.length * 4 + playlists.length * 5,
+      ),
+    ),
+  );
+
+  const confidence = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(
+        history.length * 2 +
+          favorites.length * 4 +
+          playlists.length * 3 +
+          sampleSize * 2,
+      ),
+    ),
+  );
+
+  const mood =
+    energyScore >= 70 ? 'energique' : energyScore <= 40 ? 'chill' : 'equilibre';
+
+  let summary = 'Commence a ecouter pour construire ton profil musical.';
+  if (topStyles.length) {
+    summary = `Tu sembles aimer ${topStyles
+      .slice(0, 3)
+      .map((s) => s.name)
+      .join(', ')}.`;
+  }
+
+  return {
+    mood,
+    summary,
+    energyScore,
+    diversityScore,
+    discoveryScore,
+    confidence,
+    sampleSize,
+    topArtists,
+    topTags,
+    topStyles,
+    totalPlays: history.reduce(
+      (sum, entry) => sum + Number(entry.playCount || 1),
+      0,
+    ),
+    totalFavorites: favorites.length,
+    playlists: playlists.length,
+  };
 }
 
 async function getRecommendationsForUser(userId, limit = 12) {
   const safeLimit = readLimitedNumber(limit, 12, 1, 30);
+
   const [profile, history, favorites, playlists, catalogDocs] =
     await Promise.all([
       getTasteProfile(userId),
-      historyDb
-        .find({ userId })
-        .sort({ lastPlayedAt: -1 })
-        .limit(TASTE_HISTORY_LIMIT),
-      favoritesDb
-        .find({ userId })
-        .sort({ createdAt: -1 })
-        .limit(TASTE_FAVORITES_LIMIT),
-      playlistsDb
-        .find({ userId })
-        .sort({ updatedAt: -1 })
-        .limit(TASTE_PLAYLIST_LIMIT),
-      tracksDb
-        .find({})
-        .sort({ updatedAt: -1 })
-        .limit(RECOMMENDATION_CATALOG_LIMIT),
+      historyDb.find({ userId }).sort({ lastPlayedAt: -1 }).limit(200),
+      favoritesDb.find({ userId }).sort({ createdAt: -1 }).limit(100),
+      playlistsDb.find({ userId }).sort({ updatedAt: -1 }).limit(50),
+      tracksDb.find({}).sort({ updatedAt: -1 }).limit(400),
     ]);
 
-  const playedIds = new Set(
-    history
-      .map((entry) => entry.track?.youtubeId || entry.signature)
-      .filter(Boolean),
-  );
-  const favoriteIds = new Set(
-    favorites
-      .map((item) => item.youtubeId || item.track?.youtubeId)
-      .filter(Boolean),
-  );
-  const playlistIds = new Set(
-    playlists
-      .flatMap((item) =>
-        (item.tracks || [])
-          .slice(0, 40)
-          .map((track) => track.youtubeId || track.id),
-      )
-      .filter(Boolean),
-  );
-  const topArtists = new Map(
-    (profile.topArtists || []).map((item, index) => [
+  const alreadyKnown = new Set();
+
+  history.forEach((entry) => {
+    if (entry.track?.youtubeId) alreadyKnown.add(entry.track.youtubeId);
+    if (entry.track?.id) alreadyKnown.add(entry.track.id);
+  });
+
+  favorites.forEach((item) => {
+    if (item.youtubeId) alreadyKnown.add(item.youtubeId);
+    if (item.trackId) alreadyKnown.add(item.trackId);
+  });
+
+  playlists.forEach((playlist) => {
+    (playlist.tracks || []).forEach((track) => {
+      if (track.youtubeId) alreadyKnown.add(track.youtubeId);
+      if (track.id) alreadyKnown.add(track.id);
+    });
+  });
+
+  const artistScores = new Map(
+    (profile.topArtists || []).map((item) => [
       item.name.toLowerCase(),
-      7 - index,
+      item.score,
     ]),
   );
-  const topTags = new Map(
-    (profile.topTags || []).map((item, index) => [
+
+  const styleScores = new Map(
+    (profile.topStyles || []).map((item) => [
       item.name.toLowerCase(),
-      5 - index,
+      item.score,
     ]),
   );
-  const topStyles = new Map(
-    (profile.topStyles || []).map((item, index) => [
+
+  const tagScores = new Map(
+    (profile.topTags || []).map((item) => [
       item.name.toLowerCase(),
-      4 - index,
+      item.score,
     ]),
   );
-  const preferredMood = profile.mood || 'equilibre';
 
   const seen = new Set();
+
   const scored = catalogDocs
     .map(normalizeTrack)
     .filter(Boolean)
     .filter((track) => {
       const key = track.youtubeId || track.id;
-      if (!key || seen.has(key)) return false;
+      if (!key || seen.has(key) || alreadyKnown.has(key)) return false;
       seen.add(key);
       return true;
     })
     .map((track) => {
-      const key = track.youtubeId || track.id;
       const blob = `${track.title} ${track.artist} ${track.tag}`.toLowerCase();
       let score = 1;
-      if (!playedIds.has(key)) score += 5;
-      if (favoriteIds.has(key)) score -= 10;
-      if (playlistIds.has(key)) score += 1.5;
-      score += topArtists.get(String(track.artist || '').toLowerCase()) || 0;
-      score += topTags.get(String(track.tag || '').toLowerCase()) || 0;
-      for (const style of inferTrackStyles(track))
-        score += topStyles.get(style) || 0;
-      score += scoreTrackMood(blob, preferredMood);
-      if (track.source === 'seed') score += 0.4;
+
+      score += artistScores.get(String(track.artist || '').toLowerCase()) || 0;
+      score += tagScores.get(String(track.tag || '').toLowerCase()) || 0;
+
+      for (const style of inferTrackStyles(track)) {
+        score += styleScores.get(style.toLowerCase()) || 0;
+      }
+
+      if (/remix|edit|bootleg|mashup/i.test(blob)) score += 4;
+      if (/french|france|français|francais|indila|stromae|aznavour/i.test(blob))
+        score += 3;
+      if (/house|disco|funk|dance|club/i.test(blob)) score += 2;
+
+      const energy = getTrackEnergy(track);
+      if (profile.mood === 'energique' && energy >= 70) score += 3;
+      if (profile.mood === 'chill' && energy <= 40) score += 3;
+      if (profile.mood === 'equilibre' && energy > 40 && energy < 75)
+        score += 2;
+
+      score += Math.random() * 0.25;
+
       return { track, score };
     })
     .sort((a, b) => b.score - a.score);
 
-  const recommendations = scored
-    .filter((item) => !playedIds.has(item.track.youtubeId || item.track.id))
-    .slice(0, safeLimit)
-    .map((item) => item.track);
-
-  if (recommendations.length >= safeLimit) return recommendations;
-  const used = new Set(
-    recommendations.map((track) => track.youtubeId || track.id),
-  );
-  const fallback = scored
-    .map((item) => item.track)
-    .filter((track) => !used.has(track.youtubeId || track.id))
-    .slice(0, safeLimit - recommendations.length);
-  return [...recommendations, ...fallback];
+  return scored.slice(0, safeLimit).map((item) => item.track);
 }
 
 async function getTasteProfile(userId) {
