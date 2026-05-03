@@ -18,9 +18,7 @@ import {
   settingsDb,
   aiUsageDb,
 } from './prismaAdapter.js';
-import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
 const __filename = fileURLToPath(import.meta.url);
 const isProduction = process.env.NODE_ENV === 'production';
 const isVercel = process.env.VERCEL === '1';
