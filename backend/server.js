@@ -52,13 +52,6 @@ const favoritesDb = await createMirroredDatastore('favorites.db');
 const settingsDb = await createMirroredDatastore('settings.db');
 const aiUsageDb = await createMirroredDatastore('ai-usage.db');
 */
-const user = await prisma.user.findUnique({
-  where: { email },
-});
-const playlists = await prisma.playlist.findMany({
-  where: { userId: req.user.id },
-  orderBy: { createdAt: 'desc' },
-});
 
 const DEFAULT_USER_PREFERENCES = Object.freeze({
   autoplay: true,

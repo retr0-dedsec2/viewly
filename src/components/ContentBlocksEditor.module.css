@@ -1,0 +1,155 @@
+.editor {
+ display: flex;
+ flex-direction: column;
+ gap: 14px;
+}
+
+.head {
+ display: flex;
+ justify-content: space-between;
+ gap: 14px;
+ align-items: flex-start;
+}
+
+.kicker {
+ display: block;
+ margin-bottom: 5px;
+ color: var(--accent);
+ font-size: 11px;
+ font-weight: 850;
+ letter-spacing: 0.08em;
+ text-transform: uppercase;
+}
+
+.head h2 {
+ margin: 0;
+ color: var(--text1);
+ font-size: 20px;
+ letter-spacing: 0;
+}
+
+.head p {
+ max-width: 640px;
+ margin: 5px 0 0;
+ color: var(--text3);
+ font-size: 13px;
+ line-height: 1.5;
+}
+
+.addBtn,
+.saveBtn,
+.iconBtn {
+ display: inline-flex;
+ align-items: center;
+ justify-content: center;
+ gap: 8px;
+ border: 1px solid var(--border);
+ border-radius: var(--radius);
+ background: var(--surface2);
+ color: var(--text1);
+ font-weight: 800;
+}
+
+.addBtn {
+ min-height: 40px;
+ padding: 0 13px;
+ flex-shrink: 0;
+}
+
+.blocks {
+ display: grid;
+ gap: 12px;
+}
+
+.block {
+ display: grid;
+ gap: 11px;
+ padding: 14px;
+ border: 1px solid var(--border);
+ border-radius: var(--radius);
+ background: var(--surface2);
+ transition: transform var(--transition), border-color var(--transition), opacity var(--transition);
+}
+
+.dragging {
+ opacity: 0.6;
+ transform: scale(0.99);
+ border-color: var(--accent);
+}
+
+.blockTop {
+ display: grid;
+ grid-template-columns: 36px 30px minmax(120px, 1fr) 36px 36px;
+ gap: 8px;
+ align-items: center;
+}
+
+.position {
+ color: var(--text3);
+ font-size: 12px;
+ font-weight: 900;
+ text-align: center;
+}
+
+.iconBtn {
+ width: 36px;
+ height: 36px;
+}
+
+.block label {
+ display: flex;
+ flex-direction: column;
+ gap: 6px;
+}
+
+.block span {
+ color: var(--text3);
+ font-size: 11px;
+ font-weight: 850;
+ letter-spacing: 0.04em;
+ text-transform: uppercase;
+}
+
+.block input,
+.block textarea,
+.block select {
+ width: 100%;
+ border: 1px solid var(--border);
+ border-radius: var(--radius);
+ background: var(--surface);
+ color: var(--text1);
+ padding: 11px 12px;
+ outline: none;
+}
+
+.block textarea {
+ resize: vertical;
+}
+
+.message {
+ padding: 11px 13px;
+ border-radius: var(--radius);
+ background: var(--accent-light);
+ color: var(--text1);
+}
+
+.saveBtn {
+ min-height: 44px;
+ background: var(--accent);
+ color: var(--accent-contrast);
+ border-color: transparent;
+}
+
+@media (max-width: 680px) {
+ .head {
+ flex-direction: column;
+ }
+
+ .blockTop {
+ grid-template-columns: 36px 28px minmax(0, 1fr);
+ }
+
+ .blockTop .iconBtn:nth-last-child(-n + 2) {
+ grid-row: 2;
+ }
+}

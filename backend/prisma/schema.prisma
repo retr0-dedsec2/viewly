@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  name        String
+  passwordHash String
+  role        String   @default("user")
+  plan        String   @default("free")
+  access      Json?
+  preferences Json?
+  bio         String?
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime?
+
+  playlists Playlist[]
+  history    History[]
+  favorites  Favorite[]
+  aiUsages   AiUsage[]
+
+  @@map("users")
+}
+
+model Playlist {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  emoji       String   @default("📁")
+  gradient    String   @default("linear-gradient(135deg,#667eea,#764ba2)")
+  isPublic    Boolean  @default(false)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tracks      Track[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("playlists")
+}
+
+model Track {
+  id          String   @id @default(cuid())
+  title       String
+  artist      String
+  duration    Int
+  emoji       String   @default("🎵")
+  youtubeId   String?
+  thumbnail   String?
+  gradient    String   @default("linear-gradient(135deg,#0b7a5c,#10203c)")
+  tag         String   @default("Playlist")
+  description String?
+  publishedAt String?
+  source      String   @default("local")
+
+  playlists Playlist[]
+  history    History[]
+  favorites  Favorite[]
+
+  @@map("tracks")
+}
+
+model History {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trackId   String
+  track     Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  playedAt  DateTime @default(now())
+
+  @@map("history")
+}
+
+model Favorite {
+  id      String @id @default(cuid())
+  userId  String
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trackId String
+  track   Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, trackId])
+  @@map("favorites")
+}
+
+model Setting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value Json
+
+  @@map("settings")
+}
+
+model AiUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  tokens    Int?
+  cost      Float?
+  createdAt DateTime @default(now())
+
+  @@map("ai_usages")
+}

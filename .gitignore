@@ -1,0 +1,15 @@
+node_modules/
+.env
+.env.*
+!.env.example
+backend/data/
+backend/uploads/
+.runtime-data/
+.runtime-uploads/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-server*.log
+.DS_Store
+
+.vercel

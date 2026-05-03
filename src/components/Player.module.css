@@ -1,393 +1,498 @@
 .player {
-  display: grid;
-  grid-template-columns: minmax(260px, 1.2fr) minmax(360px, 1fr) minmax(220px, 0.7fr);
-  align-items: center;
-  gap: 18px;
-  padding: 14px 20px;
-  min-height: var(--player-h);
-  background: rgba(10, 14, 24, 0.86);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  border-top: 1px solid var(--border);
-  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.2);
-  flex-shrink: 0;
-  position: relative;
+ grid-column: 1 / -1;
+ grid-row: 2;
+ display: grid;
+ grid-template-columns: minmax(250px, 1fr) minmax(360px, 0.9fr) minmax(240px, 0.78fr);
+ align-items: center;
+ gap: 18px;
+ min-height: var(--player-h);
+ padding: 14px 20px;
+ background: rgba(5, 6, 5, 0.94);
+ color: #f4f7f1;
+ border-top: 1px solid rgba(255, 255, 255, 0.08);
+ box-shadow: 0 -24px 70px rgba(0, 0, 0, 0.34);
+ backdrop-filter: blur(22px);
+ -webkit-backdrop-filter: blur(22px);
+ position: relative;
+ z-index: 20;
 }
 
-:global(:root[data-theme='light']) .player {
-  background: rgba(255, 255, 255, 0.82);
+.player.collapsed {
+ grid-template-columns: minmax(0, 1fr) auto;
+ min-height: 74px;
+ padding: 9px 16px;
+ gap: 14px;
 }
 
 .hiddenEmbed {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
+ position: absolute;
+ width: 1px;
+ height: 1px;
+ overflow: hidden;
+ opacity: 0;
+ pointer-events: none;
+}
+
+.miniTrack {
+ display: grid;
+ grid-template-columns: 48px minmax(0, 1fr);
+ align-items: center;
+ gap: 12px;
+ min-width: 0;
+ color: inherit;
+ text-align: left;
+}
+
+.miniTrack:hover .miniArt {
+ transform: scale(1.03);
+}
+
+.miniArt {
+ width: 48px;
+ height: 48px;
+ border-radius: 14px;
+ background-size: cover;
+ background-position: center;
+ box-shadow: 0 10px 26px rgba(0, 0, 0, 0.34);
+ transition: transform var(--transition);
+}
+
+.miniInfo {
+ display: flex;
+ flex-direction: column;
+ gap: 4px;
+ min-width: 0;
+}
+
+.miniInfo strong,
+.miniInfo span {
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+}
+
+.miniInfo strong {
+ color: #f4f7f1;
+ font-size: 13.5px;
+ font-weight: 850;
+}
+
+.miniInfo span {
+ color: rgba(244, 247, 241, 0.58);
+ font-size: 11.5px;
+}
+
+.miniProgress {
+ width: min(360px, 100%);
+ height: 4px;
+ overflow: hidden;
+ border-radius: 999px;
+ background: rgba(255, 255, 255, 0.13);
+}
+
+.miniProgress span {
+ display: block;
+ height: 100%;
+ border-radius: inherit;
+ background: var(--accent);
+ transition: width 0.25s linear;
+}
+
+.miniActions {
+ display: flex;
+ align-items: center;
+ justify-content: flex-end;
+ gap: 9px;
+}
+
+.expandBtn {
+ width: 38px;
+ height: 38px;
+ display: grid;
+ place-items: center;
+ border-radius: 50%;
+ background: var(--accent);
+ color: var(--accent-contrast);
+ box-shadow: 0 10px 24px rgba(30, 215, 96, 0.24);
 }
 
 .trackInfo {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
+ display: flex;
+ align-items: center;
+ gap: 14px;
+ min-width: 0;
 }
 
 .artWrap {
-  position: relative;
+ position: relative;
+ flex-shrink: 0;
 }
 
 .art {
-  width: 62px;
-  height: 62px;
-  border-radius: 18px;
-  background-size: cover;
-  background-position: center;
-  flex-shrink: 0;
-  box-shadow: var(--shadow);
+ width: 64px;
+ height: 64px;
+ border-radius: var(--radius);
+ background-size: cover;
+ background-position: center;
+ box-shadow: 0 14px 34px rgba(0, 0, 0, 0.38);
 }
 
 .liveBadge {
-  position: absolute;
-  right: -5px;
-  bottom: -5px;
-  min-width: 26px;
-  height: 26px;
-  padding: 0 8px;
-  border-radius: 999px;
-  display: grid;
-  place-items: center;
-  background: var(--accent);
-  color: white;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  box-shadow: 0 10px 24px rgba(20, 163, 127, 0.35);
+ position: absolute;
+ right: -6px;
+ bottom: -6px;
+ min-width: 27px;
+ height: 27px;
+ padding: 0 8px;
+ border-radius: 999px;
+ display: grid;
+ place-items: center;
+ background: var(--accent);
+ color: var(--accent-contrast);
+ font-size: 9px;
+ font-weight: 950;
+ letter-spacing: 0.06em;
+ box-shadow: 0 10px 26px rgba(30, 215, 96, 0.30);
 }
 
 .info {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+ flex: 1;
+ min-width: 0;
+ display: flex;
+ flex-direction: column;
+ gap: 4px;
 }
 
 .metaTop {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+ display: flex;
+ align-items: center;
+ gap: 8px;
+ min-width: 0;
 }
 
 .title {
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+ font-size: 14.5px;
+ font-weight: 850;
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
 }
 
 .tag {
-  flex-shrink: 0;
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  color: var(--accent);
-  background: var(--accent-light);
-  padding: 4px 8px;
-  border-radius: 999px;
+ flex-shrink: 0;
+ max-width: 110px;
+ overflow: hidden;
+ text-overflow: ellipsis;
+ white-space: nowrap;
+ padding: 4px 8px;
+ border-radius: 999px;
+ color: var(--accent);
+ background: rgba(30, 215, 96, 0.13);
+ font-size: 9.5px;
+ font-weight: 900;
+ letter-spacing: 0.06em;
+ text-transform: uppercase;
 }
 
 .artist {
-  font-size: 12px;
-  color: var(--text3);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.youtubeLink {
-  font-size: 11.5px;
-  color: var(--text2);
-  opacity: 0.9;
+ color: rgba(244, 247, 241, 0.58);
+ font-size: 12px;
+ white-space: nowrap;
+ overflow: hidden;
+ text-overflow: ellipsis;
 }
 
 .likeBtn {
-  color: var(--text3);
-  transition: color var(--transition), transform var(--transition);
-  flex-shrink: 0;
-  padding: 8px;
-  display: grid;
-  place-items: center;
+ width: 38px;
+ height: 38px;
+ border-radius: 50%;
+ color: rgba(244, 247, 241, 0.64);
+ transition: color var(--transition), transform var(--transition), background var(--transition);
+ flex-shrink: 0;
+ display: grid;
+ place-items: center;
 }
 
-.likeBtn:hover { color: var(--accent); }
+.likeBtn:hover {
+ color: var(--accent);
+ background: rgba(255, 255, 255, 0.08);
+}
 
 .likeBtn.liked {
-  color: var(--accent);
-  animation: heartPop 0.3s ease;
+ color: var(--accent);
+ animation: heartPop 0.3s ease;
 }
 
 @keyframes heartPop {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.28); }
+ 0%, 100% { transform: scale(1); }
+ 50% { transform: scale(1.24); }
 }
 
 .center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
+ display: flex;
+ flex-direction: column;
+ align-items: center;
+ gap: 10px;
+ min-width: 0;
 }
 
 .controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+ display: flex;
+ align-items: center;
+ gap: 12px;
 }
 
 .ctrl {
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  font-size: 14px;
-  color: var(--text3);
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 50%;
-  transition: transform var(--transition), color var(--transition), background var(--transition);
+ width: 34px;
+ height: 34px;
+ display: grid;
+ place-items: center;
+ color: rgba(244, 247, 241, 0.62);
+ background: rgba(255, 255, 255, 0.07);
+ border: 1px solid rgba(255, 255, 255, 0.08);
+ border-radius: 50%;
+ transition: transform var(--transition), color var(--transition), background var(--transition);
 }
 
 .ctrl:hover {
-  color: var(--text1);
-  transform: translateY(-1px);
+ color: #ffffff;
+ background: rgba(255, 255, 255, 0.12);
+ transform: translateY(-1px);
 }
 
 .ctrl svg,
 .playBtn svg,
 .likeBtn svg {
-  display: block;
+ display: block;
 }
 
 .ctrlActive {
-  color: white;
-  background: var(--accent);
-  border-color: transparent;
+ color: var(--accent-contrast);
+ background: var(--accent);
+ border-color: transparent;
 }
 
 .playBtn {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--accent2));
-  color: white;
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform var(--transition), box-shadow var(--transition);
-  flex-shrink: 0;
-  box-shadow: 0 16px 28px rgba(113, 101, 255, 0.28);
+ width: 48px;
+ height: 48px;
+ border-radius: 50%;
+ background: #ffffff;
+ color: #050605;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ transition: transform var(--transition), box-shadow var(--transition);
+ flex-shrink: 0;
+ box-shadow: 0 12px 28px rgba(0, 0, 0, 0.30);
 }
 
 .playBtn:hover {
-  transform: scale(1.05);
+ transform: scale(1.05);
 }
 
 .progressRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
+ display: flex;
+ align-items: center;
+ gap: 10px;
+ width: 100%;
 }
 
 .time {
-  font-size: 11px;
-  color: var(--text3);
-  font-variant-numeric: tabular-nums;
-  width: 34px;
-  flex-shrink: 0;
+ width: 36px;
+ flex-shrink: 0;
+ color: rgba(244, 247, 241, 0.52);
+ font-size: 11px;
+ font-variant-numeric: tabular-nums;
 }
 
-.time:first-child { text-align: right; }
+.time:first-child {
+ text-align: right;
+}
 
 .progressTrack {
-  flex: 1;
-  height: 7px;
-  background: var(--surface3);
-  border-radius: 999px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
+ flex: 1;
+ height: 6px;
+ background: rgba(255, 255, 255, 0.16);
+ border-radius: 999px;
+ cursor: pointer;
+ position: relative;
+ overflow: visible;
 }
 
 .progressFill {
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent2));
-  border-radius: 999px;
-  transition: width 0.25s linear;
-  pointer-events: none;
+ position: absolute;
+ left: 0;
+ top: 0;
+ height: 100%;
+ background: var(--accent);
+ border-radius: 999px;
+ transition: width 0.25s linear;
+ pointer-events: none;
 }
 
 .progressThumb {
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: white;
-  border: 3px solid var(--accent2);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-  opacity: 0;
-  transition: opacity var(--transition);
-  pointer-events: none;
+ position: absolute;
+ top: 50%;
+ transform: translate(-50%, -50%);
+ width: 13px;
+ height: 13px;
+ border-radius: 50%;
+ background: white;
+ box-shadow: 0 6px 18px rgba(0, 0, 0, 0.24);
+ opacity: 0;
+ transition: opacity var(--transition);
+ pointer-events: none;
 }
 
 .progressTrack:hover .progressThumb {
-  opacity: 1;
+ opacity: 1;
 }
 
 .right {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 10px;
+ display: flex;
+ align-items: center;
+ justify-content: flex-end;
+ gap: 10px;
+ min-width: 0;
 }
 
 .statusPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 12px;
-  border-radius: 999px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  font-size: 11px;
-  color: var(--text2);
-  white-space: nowrap;
+ display: inline-flex;
+ align-items: center;
+ gap: 8px;
+ padding: 9px 11px;
+ border-radius: 999px;
+ background: rgba(255, 255, 255, 0.07);
+ border: 1px solid rgba(255, 255, 255, 0.08);
+ color: rgba(244, 247, 241, 0.68);
+ font-size: 11px;
+ white-space: nowrap;
 }
 
 .statusDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 6px rgba(255, 0, 51, 0.12);
+ width: 8px;
+ height: 8px;
+ border-radius: 50%;
+ background: var(--accent);
+ box-shadow: 0 0 0 6px rgba(30, 215, 96, 0.12);
 }
 
 .volTrack {
-  width: 110px;
-  accent-color: var(--accent);
+ width: 104px;
+ accent-color: var(--accent);
 }
 
 @media (max-width: 1100px) {
-  .player {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    min-height: 160px;
-    padding: 16px 18px;
-  }
+ .player {
+ grid-template-columns: 1fr;
+ min-height: 166px;
+ gap: 12px;
+ }
 
-  .trackInfo,
-  .center,
-  .right {
-    width: 100%;
-  }
+ .trackInfo,
+ .center,
+ .right {
+ width: 100%;
+ }
 
-  .trackInfo {
-    justify-content: center;
-    margin: 0 auto;
-  }
+ .trackInfo {
+ justify-content: center;
+ margin: 0 auto;
+ }
 
-  .center {
-    max-width: 720px;
-    width: min(720px, 100%);
-    margin: 0 auto;
-  }
+ .center {
+ width: min(720px, 100%);
+ margin: 0 auto;
+ }
 
-  .right {
-    justify-content: center;
-    flex-wrap: wrap;
-    margin: 0 auto;
-  }
+ .right {
+ justify-content: center;
+ flex-wrap: wrap;
+ }
+}
+
+@media (max-width: 920px) {
+ .player {
+ grid-row: 3;
+ }
 }
 
 @media (max-width: 720px) {
-  .player {
-    padding: 14px 12px calc(14px + env(safe-area-inset-bottom));
-    gap: 10px;
-  }
+ .player.collapsed {
+ grid-template-columns: minmax(0, 1fr) auto;
+ min-height: 74px;
+ padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
+ }
 
-  .trackInfo {
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    flex-wrap: wrap;
-  }
+ .miniTrack {
+ grid-template-columns: 44px minmax(0, 1fr);
+ gap: 10px;
+ }
 
-  .info {
-    align-items: center;
-  }
+ .miniArt {
+ width: 44px;
+ height: 44px;
+ border-radius: 12px;
+ }
 
-  .metaTop,
-  .artist,
-  .youtubeLink {
-    justify-content: center;
-    text-align: center;
-  }
+ .miniActions {
+ gap: 7px;
+ }
 
-  .art {
-    width: 54px;
-    height: 54px;
-    border-radius: 16px;
-  }
+ .player.collapsed .ctrl,
+ .expandBtn {
+ width: 36px;
+ height: 36px;
+ }
 
-  .metaTop {
-    flex-wrap: wrap;
-  }
+ .player {
+ padding: 14px 12px calc(14px + env(safe-area-inset-bottom));
+ gap: 10px;
+ }
 
-  .title {
-    white-space: normal;
-  }
+ .trackInfo {
+ justify-content: flex-start;
+ }
 
-  .controls {
-    gap: 8px;
-  }
+ .art {
+ width: 54px;
+ height: 54px;
+ }
 
-  .ctrl {
-    width: 32px;
-    height: 32px;
-  }
+ .metaTop {
+ flex-wrap: wrap;
+ }
 
-  .playBtn {
-    width: 42px;
-    height: 42px;
-  }
+ .tag,
+ .statusPill {
+ display: none;
+ }
 
-  .progressRow {
-    gap: 8px;
-  }
+ .title {
+ white-space: normal;
+ line-height: 1.2;
+ }
 
-  .time {
-    width: 30px;
-    font-size: 10px;
-  }
+ .controls {
+ gap: 8px;
+ }
 
-  .statusPill {
-    width: 100%;
-    justify-content: center;
-  }
+ .ctrl {
+ width: 32px;
+ height: 32px;
+ }
 
-  .volTrack {
-    width: min(220px, 58vw);
-  }
+ .playBtn {
+ width: 44px;
+ height: 44px;
+ }
+
+ .time {
+ width: 30px;
+ font-size: 10px;
+ }
+
+ .volTrack {
+ width: min(220px, 58vw);
+ }
 }
